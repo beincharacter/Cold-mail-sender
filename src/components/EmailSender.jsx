@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Typography, Box, CircularProgress, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Button, Typography, Box, CircularProgress, Select, MenuItem, FormControl, InputLabel, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import axios from 'axios';
 
 function EmailSender() {
@@ -7,10 +9,9 @@ function EmailSender() {
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [dataset, setDataset] = useState([]);
   const [sending, setSending] = useState(false);
-  const [result, setResult] = useState('');
+  const [emailStatuses, setEmailStatuses] = useState([]);
 
   useEffect(() => {
-    // Load templates and dataset from localStorage
     const savedTemplates = JSON.parse(localStorage.getItem('emailTemplates') || '[]');
     const savedDataset = JSON.parse(localStorage.getItem('emailDataset') || '[]');
     setTemplates(savedTemplates);
@@ -19,21 +20,35 @@ function EmailSender() {
 
   const handleSendEmails = async () => {
     if (!selectedTemplate) {
-      setResult('Please select a template before sending emails.');
+      setEmailStatuses([{ error: 'Please select a template before sending emails.' }]);
       return;
     }
-
     setSending(true);
-    setResult('');
-    try {
-      const templateContent = templates.find(t => t.name === selectedTemplate).content;
-      const response = await axios.post('http://localhost:3001/api/send-emails', { template: templateContent, dataset });
-      setResult(`Emails sent successfully! ${response.data.message}`);
-    } catch (error) {
-      setResult(`Error sending emails: ${error.message}`);
-    } finally {
-      setSending(false);
+    setEmailStatuses(dataset.map(() => ({ status: 'pending' })));
+
+    const templateContent = templates.find(t => t.name === selectedTemplate).content;
+
+    for (let i = 0; i < dataset.length; i++) {
+      try {
+        const response = await axios.post('http://localhost:3001/api/send-emails', { 
+          template: templateContent, 
+          dataset: [dataset[i]]  // Send one email at a time
+        });
+        setEmailStatuses(prev => {
+          const newStatuses = [...prev];
+          newStatuses[i] = { status: 'success', message: response.data.message };
+          return newStatuses;
+        });
+      } catch (error) {
+        setEmailStatuses(prev => {
+          const newStatuses = [...prev];
+          newStatuses[i] = { status: 'error', message: error.message };
+          return newStatuses;
+        });
+      }
     }
+
+    setSending(false);
   };
 
   return (
@@ -42,9 +57,12 @@ function EmailSender() {
         Send Emails
       </Typography>
       <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel>Select Template</InputLabel>
+        <InputLabel id="template-select-label">Select Template</InputLabel>
         <Select
+          labelId="template-select-label"
+          id="template-select"
           value={selectedTemplate}
+          label="Select Template"
           onChange={(e) => setSelectedTemplate(e.target.value)}
         >
           {templates.map((template, index) => (
@@ -62,10 +80,26 @@ function EmailSender() {
       >
         {sending ? <CircularProgress size={24} /> : 'Send Emails'}
       </Button>
-      {result && (
-        <Typography variant="body1" sx={{ mt: 2 }}>
-          {result}
-        </Typography>
+      {emailStatuses.length > 0 && (
+        <List>
+          {dataset.map((recipient, index) => (
+            <ListItem key={index}>
+              <ListItemIcon>
+                {emailStatuses[index]?.status === 'success' ? (
+                  <CheckCircleOutlineIcon color="success" />
+                ) : emailStatuses[index]?.status === 'error' ? (
+                  <ErrorOutlineIcon color="error" />
+                ) : (
+                  <CircularProgress size={24} />
+                )}
+              </ListItemIcon>
+              <ListItemText 
+                primary={recipient.recipient_email}
+                secondary={emailStatuses[index]?.message || 'Pending...'}
+              />
+            </ListItem>
+          ))}
+        </List>
       )}
     </Box>
   );
