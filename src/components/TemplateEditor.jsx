@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 function TemplateEditor() {
   const [templates, setTemplates] = useState([]);
@@ -9,7 +11,6 @@ function TemplateEditor() {
   const [editingIndex, setEditingIndex] = useState(null);
 
   useEffect(() => {
-    // Load templates from localStorage
     const savedTemplates = JSON.parse(localStorage.getItem('emailTemplates') || '[]');
     setTemplates(savedTemplates);
   }, []);
@@ -18,12 +19,10 @@ function TemplateEditor() {
     if (currentTemplate.name && currentTemplate.content) {
       let updatedTemplates;
       if (editingIndex !== null) {
-        // Update existing template
         updatedTemplates = templates.map((template, index) =>
           index === editingIndex ? currentTemplate : template
         );
       } else {
-        // Add new template
         updatedTemplates = [...templates, currentTemplate];
       }
       setTemplates(updatedTemplates);
@@ -59,33 +58,32 @@ function TemplateEditor() {
         onChange={(e) => setCurrentTemplate({ ...currentTemplate, name: e.target.value })}
         sx={{ mb: 2 }}
       />
-      <TextField
-        fullWidth
-        multiline
-        rows={10}
-        label="Template Content"
+      <ReactQuill
+        theme="snow"
         value={currentTemplate.content}
-        onChange={(e) => setCurrentTemplate({ ...currentTemplate, content: e.target.value })}
+        onChange={(content) => setCurrentTemplate({ ...currentTemplate, content })}
         placeholder="Enter your email template here. Use {{ variable_name }} for placeholders."
-        sx={{ mb: 2 }}
+        style={{ height: '300px', marginBottom: '50px' }}
       />
-      <Button variant="contained" onClick={handleSave}>
-        {editingIndex !== null ? 'Update Template' : 'Save Template'}
-      </Button>
+      <Box sx={{ mt: 8, mb: 2 }}>
+        <Button variant="contained" onClick={handleSave}>
+          {editingIndex !== null ? 'Update Template' : 'Save Template'}
+        </Button>
+      </Box>
 
       <TableContainer component={Paper} sx={{ mt: 4 }}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>Template Name</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {templates.map((template, index) => (
               <TableRow key={index}>
                 <TableCell>{template.name}</TableCell>
-                <TableCell>
+                <TableCell align="right">
                   <IconButton onClick={() => handleEdit(index)} color="primary">
                     <EditIcon />
                   </IconButton>

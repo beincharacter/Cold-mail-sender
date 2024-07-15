@@ -10,7 +10,6 @@ function EmailSender() {
   const [result, setResult] = useState('');
 
   useEffect(() => {
-    // Load templates and dataset from localStorage
     const savedTemplates = JSON.parse(localStorage.getItem('emailTemplates') || '[]');
     const savedDataset = JSON.parse(localStorage.getItem('emailDataset') || '[]');
     setTemplates(savedTemplates);
