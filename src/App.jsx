@@ -7,6 +7,8 @@ import Home from './components/Home';
 import TemplateEditor from './components/TemplateEditor';
 import DatasetEditor from './components/DatasetEditor';
 import EmailSender from './components/EmailSender';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
 const theme = createTheme();
 
@@ -22,6 +24,8 @@ function App() {
             <Route path="/template" element={<TemplateEditor />} />
             <Route path="/dataset" element={<DatasetEditor />} />
             <Route path="/send" element={<EmailSender />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
           </Routes>
         </Container>
       </Router>

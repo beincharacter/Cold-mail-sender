@@ -33,8 +33,7 @@ function Home() {
                     '&:hover': {
                         color: 'white'
                     }
-                }}
-                >
+                }}>
                     Send Emails
                 </Button>
             </Box>

@@ -1,55 +1,55 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 function Header() {
   return (
     <AppBar position="static">
-      <Container maxWidth="lg">
-        <Toolbar disableGutters>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, textAlign: 'left' }}
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Typography
+          variant="h6"
+          component={RouterLink}
+          to="/"
+          sx={{
+            textDecoration: 'none',
+            color: 'inherit',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              color: 'white',
+            }
+          }}
+        >
+          Email Sender
+        </Typography>
+        <Box>
+          <Button
+            color="inherit"
+            component={RouterLink}
+            to="/login"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: 'white'
+              }
+            }}
           >
-            Email Sender
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button 
-              color="inherit" 
-              component={RouterLink} 
-              to="/"
-              sx={{ '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)', color: 'white' } }}
-            >
-              Home
-            </Button>
-            <Button 
-              color="inherit" 
-              component={RouterLink} 
-              to="/template"
-              sx={{ '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)', color: 'white' } }}
-            >
-              Template
-            </Button>
-            <Button 
-              color="inherit" 
-              component={RouterLink} 
-              to="/dataset"
-              sx={{ '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)', color: 'white' } }}
-            >
-              Dataset
-            </Button>
-            <Button 
-              color="inherit" 
-              component={RouterLink} 
-              to="/send"
-              sx={{ '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)', color: 'white' } }}
-            >
-              Send Emails
-            </Button>
-          </Box>
-        </Toolbar>
-      </Container>
+            Login
+          </Button>
+          <Button
+            color="inherit"
+            component={RouterLink}
+            to="/register"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: 'white'
+              }
+            }}
+          >
+            Register
+          </Button>
+        </Box>
+      </Toolbar>
     </AppBar>
   );
 }
